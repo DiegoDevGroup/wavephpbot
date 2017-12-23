@@ -11,9 +11,11 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+if (config('app.env') != 'production'){
+    Route::get('/', function () {
+        return view('welcome');
+    });
+    Route::get('/botman/tinker', 'BotManController@tinker');
+}
 
 Route::match(['get', 'post'], '/botman', 'BotManController@handle');
-Route::get('/botman/tinker', 'BotManController@tinker');
