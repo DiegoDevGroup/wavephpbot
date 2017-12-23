@@ -13,6 +13,14 @@ class IntroductionConversation extends Conversation
      */
     public function run()
     {
-        $this->say('Hi! I am the WavePHP Bot.');
+        $question = Question::create( 'Hey there, I am the WavePHPBot. Is there something I can help you with?');
+
+        $this->ask( $question, function (Answer $answer) {
+            if ($answer->getText() === 'yes') {
+                $this->say('Wonderful, what can I help you with?');
+            } else {
+                $this->say('No problem, thanks for stopping by');
+            }
+        });
     }
 }
