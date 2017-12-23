@@ -11,11 +11,19 @@
 |
 */
 
+// Only display these routes in non-production environments
 if (config('app.env') != 'production'){
     Route::get('/', function () {
         return view('welcome');
     });
     Route::get('/botman/tinker', 'BotManController@tinker');
+}
+
+// Redirect for the production site
+if (config('app.env') == 'production'){
+    Route::get('/', function () {
+        return redirect('https://www.wavephp.com');
+    });
 }
 
 Route::match(['get', 'post'], '/botman', 'BotManController@handle');
