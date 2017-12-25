@@ -11,7 +11,7 @@ $botman->middleware->received($dialogflow);
 
 $botman->hears('greet', function ($bot) {
     $user = $bot->getUser();
-    $greet = array_random([ 'Hello', 'Hey there', 'Greetings','Yo, what\'s up' ]);
+    $greet = array_random([ 'Hello', 'Hey there', 'Greetings','Yo, what\'s up', 'Salutations', 'Bonjour', 'Hola', 'Namaste' ]);
     $bot->reply($greet . ' ' . $user->getFirstName());
 })->middleware($dialogflow);
 
