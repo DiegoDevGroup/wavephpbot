@@ -10,7 +10,9 @@ $dialogflow = ApiAi::create(config('wave.dialogflow_key'))->listenForAction();
 $botman->middleware->received($dialogflow);
 
 $botman->hears('greet', function ($bot) {
-    $bot->reply('Hello there.');
+    $user = $bot->getUser();
+    $greet = array_random([ 'Hello', 'Hey there', 'Greetings','Yo, what\'s up' ]);
+    $bot->reply($greet . ' ' . $user->getFirstName());
 })->middleware($dialogflow);
 
 $botman->hears('info', function ($bot) {
