@@ -30,7 +30,7 @@ $botman->hears('speaker', function ($bot) {
 })->middleware($dialogflow);
 
 $botman->hears('cfp', function ($bot) {
-    $bot->reply('Call for papers will be opened sometime in January.');
+    $bot->reply('Call for papers has closed and speakers will be announced soon.');
 })->middleware($dialogflow);
 
 $botman->hears('help', function ($bot) {
