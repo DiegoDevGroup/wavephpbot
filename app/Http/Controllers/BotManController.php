@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use BotMan\BotMan\BotMan;
+use BotMan\BotMan\Messages\Attachments\Image;
+use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
 use Illuminate\Http\Request;
 use App\Conversations\ExampleConversation;
 
@@ -77,5 +79,30 @@ class BotManController extends Controller
     public function speaker(Botman $bot)
     {
         $bot->reply('Speakers have not been announced yet. Be patient, we promise it will be worth it.');
+    }
+
+    public function speaker_bio(Botman $bot)
+    {
+        $speaker = data_get($bot->getMessage()->getExtras(), 'apiParameters.speaker');
+
+        $url = "https://wavephp-conf.firebaseio.com/speakers/{$speaker}.json";
+
+        $results = json_decode(file_get_contents($url), true);
+
+        $bio = $results['bio'];
+        $photo_url = $results['photo'];
+
+        $bot->reply($bio);
+
+        // Create attachment
+        $attachment = new Image($photo_url, [
+            'custom_payload' => true,
+        ]);
+
+        // Build message object
+        $message = OutgoingMessage::create()->withAttachment($attachment);
+
+        // Reply message object
+        $bot->reply($message);
     }
 }
