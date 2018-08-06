@@ -15,4 +15,5 @@ $botman->group(['middleware' => $dialogflow], function ($bot){
     $bot->hears('info', BotManController::class . '@info');
     $bot->hears('speaker', BotManController::class . '@speaker');
     $bot->hears('speaker_bio', BotManController::class . '@speaker_bio');
+    $bot->hears('sponsor_information', BotManController::class . '@sponsor_information');
 });

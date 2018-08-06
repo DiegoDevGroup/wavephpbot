@@ -105,4 +105,32 @@ class BotManController extends Controller
         // Reply message object
         $bot->reply($message);
     }
+
+    public function sponsor_information(Botman $bot)
+    {
+        $sponsor = data_get($bot->getMessage()->getExtras(), 'apiParameters.sponsor');
+
+        $url = "https://wavephp-conf.firebaseio.com/sponsors/{$sponsor}.json";
+
+        $results = json_decode(file_get_contents($url), true);
+
+        $name = $results['name'];
+        $description = $results['description'];
+        $twitter = $results['twitter'];
+        $url = $results['url'];
+        $logo = $results['logo'];
+
+        $attachment = new Image($logo, [
+            'custom_payload' => true,
+        ]);
+
+        $message = OutgoingMessage::create()->withAttachment($attachment);
+        $bot->reply($message);
+
+        $bot->reply(vsprintf("%s: %s\n%s", [
+            $name,
+            $description,
+            $url,
+        ]));
+    }
 }
