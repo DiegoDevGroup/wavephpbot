@@ -90,15 +90,15 @@ class BotManController extends Controller
         );
 
 
-        $bot->reply('Our awesome speaker line up;');
+        $reply = '';
         foreach ($speakers as $speaker) {
 
-            $reply = ($speaker['twitter'] != null) ? $speaker['first_name'].' '.
-                $speaker['last_name'] .' (@'. $speaker['twitter'] .')' :
-                $speaker['first_name'].' '. $speaker['last_name'];
-
-                $bot->reply($reply);
+            $reply .= ($speaker['twitter'] != null) ? $speaker['first_name'].' '.
+                $speaker['last_name'] .' (@'. $speaker['twitter'] .') ~*~ ' :
+                $speaker['first_name'].' '. $speaker['last_name'] .' ~*~ ';
         }
+        $bot->reply('Our awesome speaker line up:');
+        $bot->reply($reply);
         $bot->reply('You can find out more about a speaker by typing');
         $bot->reply('`tell me about <speaker\'s name>`');
     }
