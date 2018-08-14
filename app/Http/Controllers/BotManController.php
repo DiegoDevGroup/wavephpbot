@@ -84,27 +84,31 @@ class BotManController extends Controller
 
     public function speaker_bio(Botman $bot)
     {
+        // get the id of the speaker the user is asking about
         $speaker = data_get($bot->getMessage()->getExtras(), 'apiParameters.speaker');
 
-        $url = "https://wavephp-conf.firebaseio.com/speakers/{$speaker}.json";
+        // fetch the speaker details
+        $speakerData = json_decode(
+            file_get_contents("https://wavephp-conf.firebaseio.com/speakers/{$speaker}.json"),
+            true
+        );
 
-        $results = json_decode(file_get_contents($url), true);
-
-        $bio = $results['bio'];
-        $photo_url = $results['photo'];
-
-        $bot->reply($bio);
-
-        // Create attachment
-        $attachment = new Image($photo_url, [
+        // create attachment with speaker image
+        $attachment = new Image($speakerData['photo'], [
             'custom_payload' => true,
         ]);
 
-        // Build message object
+        // build the speaker image message
         $message = OutgoingMessage::create()->withAttachment($attachment);
 
-        // Reply message object
+        // Reply with speaker image
         $bot->reply($message);
+
+        // reply with the speaker's biography and twitter
+        $result = $bot->reply(vsprintf("%s\n%s", [
+            $speakerData['bio'],
+            'https://twitter.com/' . $speakerData['twitter'],
+        ]));
     }
 
     public function speaker_schedule(Botman $bot)
