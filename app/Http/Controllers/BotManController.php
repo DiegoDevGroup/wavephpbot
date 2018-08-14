@@ -142,29 +142,35 @@ class BotManController extends Controller
 
     public function sponsor_information(Botman $bot)
     {
+        // get the sponsor the user is asking about
         $sponsor = data_get($bot->getMessage()->getExtras(), 'apiParameters.sponsor');
 
-        $url = "https://wavephp-conf.firebaseio.com/sponsors/{$sponsor}.json";
+        // fetch the sponsor details from Firebase
+        $sponsorData = json_decode(
+            file_get_contents("https://wavephp-conf.firebaseio.com/sponsors/{$sponsor}.json"),
+            true
+        );
 
-        $results = json_decode(file_get_contents($url), true);
+        // generate formatted response text
+        $formattedResponse = vsprintf("%s\n%s\n%s", [
+            $sponsorData['description'],
+            $sponsorData['url'],
+            'https://twitter.com/' . $sponsorData['twitter'],
+        ]);
 
-        $name = $results['name'];
-        $description = $results['description'];
-        $twitter = $results['twitter'];
-        $url = $results['url'];
-        $logo = $results['logo'];
-
-        $attachment = new Image($logo, [
+        // create attachment with sponsor logo image
+        $attachment = new Image($sponsorData['logo'], [
             'custom_payload' => true,
         ]);
 
-        $message = OutgoingMessage::create()->withAttachment($attachment);
+        // build the logo message
+        $message = OutgoingMessage::create()
+                                  ->withAttachment($attachment);
+
+        // send the logo
         $bot->reply($message);
 
-        $bot->reply(vsprintf("%s: %s\n%s", [
-            $name,
-            $description,
-            $url,
-        ]));
+        // send text
+        $bot->reply($formattedResponse);
     }
 }
