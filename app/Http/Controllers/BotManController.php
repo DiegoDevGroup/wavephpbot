@@ -84,35 +84,48 @@ class BotManController extends Controller
 
     public function speaker_bio(Botman $bot)
     {
+        // get the id of the speaker the user is asking about
         $speaker = data_get($bot->getMessage()->getExtras(), 'apiParameters.speaker');
 
-        $url = "https://wavephp-conf.firebaseio.com/speakers/{$speaker}.json";
+        // fetch the speaker details
+        $speakerData = json_decode(
+            file_get_contents("https://wavephp-conf.firebaseio.com/speakers/{$speaker}.json"),
+            true
+        );
 
-        $results = json_decode(file_get_contents($url), true);
-
-        $bio = $results['bio'];
-        $photo_url = $results['photo'];
-
-        $bot->reply($bio);
-
-        // Create attachment
-        $attachment = new Image($photo_url, [
+        // create attachment with speaker image
+        $attachment = new Image($speakerData['photo'], [
             'custom_payload' => true,
         ]);
 
-        // Build message object
+        // build the speaker image message
         $message = OutgoingMessage::create()->withAttachment($attachment);
 
-        // Reply message object
+        // Reply with speaker image
         $bot->reply($message);
+
+        // reply with the speaker's biography and twitter
+        $bot->reply(vsprintf("%s\n%s", [
+            $speakerData['bio'],
+            'https://twitter.com/' . $speakerData['twitter'],
+        ]));
     }
 
     public function speaker_schedule(Botman $bot)
     {
+        // get the id of the speaker the user is asking about
         $speakerId = data_get($bot->getMessage()->getExtras(), 'apiParameters.speaker');
 
+        // fetch the speaker details
+        $speakerData = json_decode(
+            file_get_contents("https://wavephp-conf.firebaseio.com/speakers/{$speakerId}.json"),
+            true
+        );
+
+        // get the schedule for WavePHP
         $schedule = json_decode(file_get_contents('https://wavephp-conf.firebaseio.com/schedule.json'), true);
 
+        // map the speaker's presentations to a nice format
         $speakersPresentations = collect($schedule)
             // filter out the talks that do not belong to the given speaker
             ->filter(function ($presentation) use ($speakerId){
@@ -124,47 +137,56 @@ class BotManController extends Controller
             })
             // map to a nice sentence
             ->map(function ($presentation){
-                $title = $presentation['talk']['title'];
-                $start = $presentation['start'];
-                $location = $presentation['location'];
-
                 return vsprintf('%s in %s at %s on %s', [
-                    $title,
-                    $location,
-                    Carbon::parse($start)->format('g:ia'),
-                    Carbon::parse($start)->format('l'),
+                    $presentation['talk']['title'],
+                    $presentation['location'],
+                    Carbon::parse($presentation['start'])->format('g:ia'),
+                    Carbon::parse($presentation['start'])->format('l'),
                 ]);
-            })
-            ->implode("\n");
-        
-        $bot->reply($speakersPresentations);
+            });
+
+        // format the response
+        $responseText = vsprintf("%s's %s:\n%s", [
+            $speakerData['name'],
+            str_plural('presentation', $speakersPresentations->count()),
+            $speakersPresentations->implode("\n"),
+        ]);
+
+        // send reply
+        $bot->reply($responseText);
     }
 
     public function sponsor_information(Botman $bot)
     {
+        // get the sponsor the user is asking about
         $sponsor = data_get($bot->getMessage()->getExtras(), 'apiParameters.sponsor');
 
-        $url = "https://wavephp-conf.firebaseio.com/sponsors/{$sponsor}.json";
+        // fetch the sponsor details from Firebase
+        $sponsorData = json_decode(
+            file_get_contents("https://wavephp-conf.firebaseio.com/sponsors/{$sponsor}.json"),
+            true
+        );
 
-        $results = json_decode(file_get_contents($url), true);
+        // generate formatted response text
+        $formattedResponse = vsprintf("%s\n%s\n%s", [
+            $sponsorData['description'],
+            $sponsorData['url'],
+            'https://twitter.com/' . $sponsorData['twitter'],
+        ]);
 
-        $name = $results['name'];
-        $description = $results['description'];
-        $twitter = $results['twitter'];
-        $url = $results['url'];
-        $logo = $results['logo'];
-
-        $attachment = new Image($logo, [
+        // create attachment with sponsor logo image
+        $attachment = new Image($sponsorData['logo'], [
             'custom_payload' => true,
         ]);
 
-        $message = OutgoingMessage::create()->withAttachment($attachment);
+        // build the logo message
+        $message = OutgoingMessage::create()
+                                  ->withAttachment($attachment);
+
+        // send the logo
         $bot->reply($message);
 
-        $bot->reply(vsprintf("%s: %s\n%s", [
-            $name,
-            $description,
-            $url,
-        ]));
+        // send text
+        $bot->reply($formattedResponse);
     }
 }
