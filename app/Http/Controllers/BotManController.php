@@ -64,7 +64,12 @@ class BotManController extends Controller
 
     public function help(Botman $bot)
     {
-        $bot->reply('You can ask me a couple things like "When is the conference?" or "Who is speaking?".');
+        $bot->reply('You can ask me a few things like such as 
+        "When is the conference?", 
+        "Who is speaking?"');
+        $bot->reply( 'You can even ask me about a specific speaker or sponsor with 
+        "Tell me about SDPHP" or 
+        "tell me about Cal Evans"');
     }
 
     public function info(Botman $bot)
@@ -79,7 +84,23 @@ class BotManController extends Controller
 
     public function speaker(Botman $bot)
     {
-        $bot->reply('Speakers have not been announced yet. Be patient, we promise it will be worth it.');
+        $speakers = json_decode(
+            file_get_contents("https://www.wavephp.com/api/speakers"),
+            true
+        );
+
+
+        $bot->reply('Our awesome speaker line up;');
+        foreach ($speakers as $speaker) {
+
+            $reply = ($speaker['twitter'] != null) ? $speaker['first_name'].' '.
+                $speaker['last_name'] .' (@'. $speaker['twitter'] .')' :
+                $speaker['first_name'].' '. $speaker['last_name'];
+
+                $bot->reply($reply);
+        }
+        $bot->reply('You can find out more about a speaker by typing');
+        $bot->reply('`tell me about <speaker\'s name>`');
     }
 
     public function speaker_bio(Botman $bot)
