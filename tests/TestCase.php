@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\BotManTester;
+use BotMan\Studio\Testing\BotManTester;
 use BotMan\BotMan\BotMan;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 

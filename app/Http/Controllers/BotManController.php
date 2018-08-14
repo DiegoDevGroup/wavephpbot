@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use BotMan\BotMan\BotMan;
+use BotMan\BotMan\Messages\Attachments\Image;
+use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Conversations\ExampleConversation;
 
@@ -77,5 +80,91 @@ class BotManController extends Controller
     public function speaker(Botman $bot)
     {
         $bot->reply('Speakers have not been announced yet. Be patient, we promise it will be worth it.');
+    }
+
+    public function speaker_bio(Botman $bot)
+    {
+        $speaker = data_get($bot->getMessage()->getExtras(), 'apiParameters.speaker');
+
+        $url = "https://wavephp-conf.firebaseio.com/speakers/{$speaker}.json";
+
+        $results = json_decode(file_get_contents($url), true);
+
+        $bio = $results['bio'];
+        $photo_url = $results['photo'];
+
+        $bot->reply($bio);
+
+        // Create attachment
+        $attachment = new Image($photo_url, [
+            'custom_payload' => true,
+        ]);
+
+        // Build message object
+        $message = OutgoingMessage::create()->withAttachment($attachment);
+
+        // Reply message object
+        $bot->reply($message);
+    }
+
+    public function speaker_schedule(Botman $bot)
+    {
+        $speakerId = data_get($bot->getMessage()->getExtras(), 'apiParameters.speaker');
+
+        $schedule = json_decode(file_get_contents('https://wavephp-conf.firebaseio.com/schedule.json'), true);
+
+        $speakersPresentations = collect($schedule)
+            // filter out the talks that do not belong to the given speaker
+            ->filter(function ($presentation) use ($speakerId){
+                return $presentation['speaker']['id'] === $speakerId;
+            })
+            // sort multiple talks by the start timestamp
+            ->sortBy(function ($presentation){
+                return $presentation['start'];
+            })
+            // map to a nice sentence
+            ->map(function ($presentation){
+                $title = $presentation['talk']['title'];
+                $start = $presentation['start'];
+                $location = $presentation['location'];
+
+                return vsprintf('%s in %s at %s on %s', [
+                    $title,
+                    $location,
+                    Carbon::parse($start)->format('g:ia'),
+                    Carbon::parse($start)->format('l'),
+                ]);
+            })
+            ->implode("\n");
+        
+        $bot->reply($speakersPresentations);
+    }
+
+    public function sponsor_information(Botman $bot)
+    {
+        $sponsor = data_get($bot->getMessage()->getExtras(), 'apiParameters.sponsor');
+
+        $url = "https://wavephp-conf.firebaseio.com/sponsors/{$sponsor}.json";
+
+        $results = json_decode(file_get_contents($url), true);
+
+        $name = $results['name'];
+        $description = $results['description'];
+        $twitter = $results['twitter'];
+        $url = $results['url'];
+        $logo = $results['logo'];
+
+        $attachment = new Image($logo, [
+            'custom_payload' => true,
+        ]);
+
+        $message = OutgoingMessage::create()->withAttachment($attachment);
+        $bot->reply($message);
+
+        $bot->reply(vsprintf("%s: %s\n%s", [
+            $name,
+            $description,
+            $url,
+        ]));
     }
 }
