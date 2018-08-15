@@ -1,3 +1,12 @@
+<p align="center"><img height="188" width="198" src="https://www.wavephp.com/img/wavephp.png"></p>
+<h1 align="center">BotMan Studio</h1>
+
+This is the [WavePHP](https://www.wavephp.com) Bot designed for the [WavePHP Conference](https://www.wavephp.com) being held in San Diego Sept 19th - 21st 2018.
+
+The WavePHP Bot is build using BotMan Studio and all the fine work they put into that project
+
+# 
+
 <p align="center"><img height="188" width="198" src="https://botman.io/img/botman.png"></p>
 <h1 align="center">BotMan Studio</h1>
 
