@@ -94,8 +94,8 @@ class BotManController extends Controller
         foreach ($speakers as $speaker) {
 
             $reply .= ($speaker['twitter'] != null) ? $speaker['first_name'].' '.
-                $speaker['last_name'] .' (@'. $speaker['twitter'] .') ~*~ ' :
-                $speaker['first_name'].' '. $speaker['last_name'] .' ~*~ ';
+                $speaker['last_name'] .' (@'. $speaker['twitter'] .") \n " :
+                $speaker['first_name'].' '. $speaker['last_name'] ." \n ";
         }
         $bot->reply('Our awesome speaker line up:');
         $bot->reply($reply);
