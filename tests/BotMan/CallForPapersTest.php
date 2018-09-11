@@ -11,7 +11,9 @@ class CallForPapersTest extends TestCase
     {
         $responseText = $this->bot->receives('when is call for papers?')->getMessages()[0]->getText();
 
-        $this->assertEquals('Call for papers has closed and speakers will be announced soon.', $responseText);
+        $expectedFragment = 'Call for papers has closed';
+
+        $this->assertTrue(str_contains($responseText, $expectedFragment));
     }
 
 }

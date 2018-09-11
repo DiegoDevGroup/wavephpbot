@@ -22,26 +22,9 @@ class BotManController extends Controller
         $botman->listen();
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function tinker()
-    {
-        return view('tinker');
-    }
-
-    /**
-     * Loaded through routes/botman.php
-     * @param  BotMan $bot
-     */
-    public function startConversation(BotMan $bot)
-    {
-        $bot->startConversation(new ExampleConversation());
-    }
-
     public function cfp(Botman $bot)
     {
-        $bot->reply('Call for papers has closed and speakers will be announced soon.');
+        $bot->reply('Call for papers has closed and you can get speaking information by asking "who is speaking?"');
     }
 
     public function greet(Botman $bot)
@@ -67,7 +50,10 @@ class BotManController extends Controller
         $bot->reply('You can ask me a few things like such as 
         "When is the conference?", 
         "Who is speaking?"');
-        $bot->reply( 'You can even ask me about a specific speaker or sponsor with 
+
+        $bot->typesAndWaits(1);
+
+        $bot->reply('You can even ask me about a specific speaker or sponsor with 
         "Tell me about SDPHP" or 
         "tell me about Cal Evans"');
     }

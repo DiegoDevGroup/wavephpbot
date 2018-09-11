@@ -9,7 +9,7 @@ class SpeakerTest extends TestCase
 
     public function testRespondsToRequestForSpecificSpeakerInformation()
     {
-        $responseText = $this->bot->receives('tell me about Juan Torres')->getMessages()[0]->getText();
+        $responseText = $this->bot->receives('tell me about Juan Torres')->getMessages()[1]->getText();
 
         $expectedFragment = 'Juan started programming back in 1999 using C';
 

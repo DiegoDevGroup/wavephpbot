@@ -1,11 +1,11 @@
 <?php
 
-use BotMan\BotMan\Middleware\ApiAi;
 use App\Http\Controllers\BotManController;
+use BotMan\BotMan\Middleware\Dialogflow;
 
 $botman = resolve('botman');
 
-$dialogflow = ApiAi::create(config('wave.dialogflow_key'))->listenForAction();
+$dialogflow = Dialogflow::create(config('wave.dialogflow_key'))->listenForAction();
 $botman->middleware->received($dialogflow);
 
 $botman->group(['middleware' => $dialogflow], function ($bot){
