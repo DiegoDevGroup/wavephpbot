@@ -67,7 +67,10 @@ class BotManController extends Controller
         $bot->reply('You can ask me a few things like such as 
         "When is the conference?", 
         "Who is speaking?"');
-        $bot->reply( 'You can even ask me about a specific speaker or sponsor with 
+        
+        $bot->typesAndWaits(1);
+
+        $bot->reply('You can even ask me about a specific speaker or sponsor with 
         "Tell me about SDPHP" or 
         "tell me about Cal Evans"');
     }
