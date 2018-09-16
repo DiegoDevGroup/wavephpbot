@@ -75,18 +75,13 @@ class BotManController extends Controller
             true
         );
 
-
-        $reply = '';
+        $formattedSpeakersString = '';
         foreach ($speakers as $speaker) {
-
-            $reply .= ($speaker['twitter'] != null) ? $speaker['first_name'].' '.
-                $speaker['last_name'] .' (@'. $speaker['twitter'] .") \n " :
-                $speaker['first_name'].' '. $speaker['last_name'] ." \n ";
+            $formattedSpeakersString .= $speaker['first_name'].' '. $speaker['last_name'] . " \n";
         }
-        $bot->reply('Our awesome speaker line up:');
-        $bot->reply($reply);
-        $bot->reply('You can find out more about a speaker by typing');
-        $bot->reply('`tell me about <speaker\'s name>`');
+        $bot->reply("Our awesome speaker line up:\n" . $formattedSpeakersString);
+        $bot->reply("You can find out more about a speaker by typing\n`tell me about <speaker's name>`.");
+        $bot->reply('Please provide feedback to speakers at https://joind.in/event/wavephp-2018');
     }
 
     public function speaker_bio(Botman $bot)
